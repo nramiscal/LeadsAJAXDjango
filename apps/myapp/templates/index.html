@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <meta charset="utf-8">
+        <title>Leads AJAX</title>
+        <style>
+        * {
+            font-family: sans-serif;
+        }
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: lavender;
+        }
+
+        form, input {
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .dates {
+            float: right;
+        }
+        </style>
+    </head>
+    <body>
+        <h1>Leads AJAX</h1>
+        <form class="" action="/search" method="post">
+            {% csrf_token %}
+            <label for="name">Name:</label>
+            <input class="name" type="text" name="name" value="">
+        </form>
+
+        <div class="dates">
+            <label for="date_from">Date From:</label>
+            <input class="date_from" type="date" name="date_from" value="">
+            <label for="date_to">Date To:</label>
+            <input class="date_to" type="date" name="date_to" value="">
+        </div>
+
+        <br><br>
+        <div class="target">
+            <table>
+                <tr>
+                    <th>Id</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Date registered</th>
+                </tr>
+                {% for lead in leads %}
+                <tr>
+                    <td>{{lead.id}}</td>
+                    <td>{{lead.fname}}</td>
+                    <td>{{lead.lname}}</td>
+                    <td>{{lead.email}}</td>
+                    <td>{{lead.created_at}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <div class="success"></div>
+        </div>
+
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            // alert("using jquery!")
+
+            function sendAjaxRequest(){
+                $.ajax({
+                    url: '/search',
+                    method: 'post',
+                    data: {
+                        'name': $('.name').val(),
+                        'date_from': $('.date_from').val(),
+                        'date_to': $('.date_to').val(),
+                    },
+                    success: function(serverResponse){
+                        // console.log("in success of .ajax");
+                        console.log("SENDING DATA:", {
+                            'name': $('.name').val(),
+                            'date_from': $('.date_from').val(),
+                            'date_to': $('.date_to').val(),
+                        });
+                        // console.log("SERVER RESPONSE:", serverResponse)
+                        $('.target').html(serverResponse);
+                    }
+                });
+            };
+
+            $('.name').keyup(function(event){
+                event.preventDefault();
+                sendAjaxRequest();
+            });
+
+            $('.date_from').change(function(event){
+                event.preventDefault();
+                sendAjaxRequest();
+            });
+
+            $('.date_to').change(function(event){
+                event.preventDefault();
+                sendAjaxRequest();
+            });
+
+        });
+    </script>
+
+    </body>
+</html>
